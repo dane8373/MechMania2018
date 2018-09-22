@@ -77,17 +77,17 @@ for line in fileinput.input():
             if check_monster(game, me.destination):
                 #
                 #
-                #chosen_stance = slay_monster(game, me.destination)
+                chosen_stance = slay_monster(game, me.destination)
                 #
                 #
-                chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
+                #chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
             # if there's a monster at my location, choose the stance that damages that monster
         if check_monster(game, me.location):
             # if there's a monster at my location, choose the stance that damages that monster
-            chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
+            #chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
             #
             #
-            #chosen_stance = slay_monster(game, me.location, chosen_stance)
+            chosen_stance = slay_monster(game, me.location)
             #
             #
         elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
@@ -100,36 +100,31 @@ for line in fileinput.input():
             #health_time=40+game.get_turn_num()
         if  me.location==0 and game.get_monster(0).dead and me.movement_counter - me.speed <= game.get_monster(0).respawn_counter and game.get_monster(0).respawn_counter < 7:
             destination_node=0
-        if me.paper >=8 and game.get_turn_num()>160:
+        if me.paper >=8 and game.get_turn_num()>125:
             early_flag=False
             mid_flag=True
             mid_num=0
-            mid_path = game.shortest_paths(me.location, 0)
+            if (me.location==1):
+                mid_path = game.shortest_paths(me.location, 4)
+            else:
+                mid_path = game.shortest_paths(me.location, 0)
 
-    if mid_flag:
+    elif mid_flag:
         if me.location == 0:
             mid_num=0
-            if me.movement_counter - me.speed <= game.get_monster(0).respawn_counter and game.get_monster(0).respawn_counter < 7:
-                mid_path=[0]
+            if game.get_monster(0).dead and me.movement_counter - me.speed <= game.get_monster(0).respawn_counter and game.get_monster(0).respawn_counter < 7:
+                mid_path=[[0]]
             if game.get_monster(4).dead == False: # go to 4
-                if game.get_monster(3).dead == False: # go through 3
+                if game.get_monster(3).dead == False and me.speed<5: # go through 3
                     mid_path = game.shortest_paths(me.location, 3)
+                else:
+                    mid_path = game.shortest_paths(me.location, 4)
             elif game.get_monster(11).dead == False: #go to 11
                 mid_path = game.shortest_paths(me.location, 11)
             elif game.get_monster(16).dead == False: #go to 16
-                mid_path = game.shortest_paths(me.location, 11)
+                mid_path = game.shortest_paths(me.location, 16)
             else:
-                dead_monsters = [11,16,4]
-                soonest=120
-                next_monster=0
-                for i in dead_monsters:
-                    if (game.get_monster(i).respawn_counter<soonest):
-                        soonest=game.get_monster(i).respawn_counter<soonest
-                        next_monster=i
-                mid_path = game.shortest_paths(me.location, next_monster)
-                #
-                #
-                #mid_path = next_to_spawn([11,16, 4], game, me)
+                mid_path = next_to_spawn([11,16, 4], game, me)
                 #
                 #
 
@@ -160,45 +155,32 @@ for line in fileinput.input():
             elif game.get_monster(13).dead == False: #go to 13
                 mid_path = game.shortest_paths(me.location, 13)
             else:
-                dead_monsters = [13, 22]
-                soonest=120
-                next_monster=0
-                for i in dead_monsters:
-                    if (game.get_monster(i).respawn_counter<soonest):
-                        soonest=game.get_monster(i).respawn_counter<soonest
-                        next_monster=i
-                mid_path = game.shortest_paths(me.location, next_monster)
-                #
-                #
-                #mid_path = next_to_spawn([13,22], game, me)
+                mid_path = next_to_spawn([13,22], game, me)
                 #
                 #
 
         if me.location == 13:
             mid_num=0
-            if game.get_monster(0).respawn_counter<20:
+            if game.get_monster(0).respawn_counter<15:
                 mid_path = game.shortest_paths(me.location, 0)
             elif me.rock >=4 and me.speed <4 and game.get_monster(20).dead == False and game.get_monster(21).dead == False:
-                mid_path = game.shortest_paths(me.location, 21)
+                mid_path = game.shortest_paths(me.location, 20)
             elif game.get_monster(16).dead == False: #go to 16
                 mid_path = game.shortest_paths(me.location, 16)
             elif game.get_monster(11).dead == False: #go to 11
                 mid_path = game.shortest_paths(me.location, 11)
             else:
-                dead_monsters = [11,16,4]
-                soonest=120
-                next_monster=0
-                for i in dead_monsters:
-                    if (game.get_monster(i).respawn_counter<soonest):
-                        soonest=game.get_monster(i).respawn_counter<soonest
-                        next_monster=i
-                mid_path = game.shortest_paths(me.location, next_monster)
                 #
                 #
-                #mid_path = next_to_spawn([11,16, 4], game, me)
+                mid_path = next_to_spawn([11,16, 4], game, me)
                 #
                 #
-
+        if me.location == 20:
+            if game.get_monster(21).dead == False and me.speed < 4: #go to 21
+                mid_path = game.shortest_paths(me.location, 21)
+            else:
+                mid_path = game.shortest_paths(me.location, 13)
+            
         if me.location == 22:
             mid_num=0
             if game.get_monster(16).dead == False: #go to 16
@@ -206,24 +188,11 @@ for line in fileinput.input():
             elif game.get_monster(11).dead == False: #go to 11
                 mid_path = game.shortest_paths(me.location, 11)
             else:
-                dead_monsters = [11,16]
-                soonest=120
-                next_monster=0
-                for i in dead_monsters:
-                    if (game.get_monster(i).respawn_counter<soonest):
-                        soonest=game.get_monster(i).respawn_counter<soonest
-                        next_monster=i
-                mid_path = game.shortest_paths(me.location, next_monster)
-
                 #
                 #
-                #mid_path = next_to_spawn([11,16], game, me)
+                mid_path = next_to_spawn([11,16], game, me)
                 #
                 #
-
-        
-                
-
         if me.location == 16:
             mid_num=0
             if  game.get_monster(0).respawn_counter<15:
@@ -275,18 +244,18 @@ for line in fileinput.input():
             if check_monster(game, me.destination):
                 #
                 #
-                #chosen_stance = slay_monster(game, me.destination)
+                chosen_stance = slay_monster(game, me.destination)
                 #
                 #
-                chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
+                #chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
         if check_monster(game, me.location):
             # if there's a monster at my location, choose the stance that damages that monster
             #
             #
-            #chosen_stance = slay_monster(game, me.destination)
+            chosen_stance = slay_monster(game, me.destination)
             #
             #
-            chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
+            #chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
         elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
             chosen_stance=get_winning_stance(opp_stance)
         else:
