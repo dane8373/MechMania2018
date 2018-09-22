@@ -53,5 +53,13 @@ for line in fileinput.input():
         # otherwise, pick a random stance
         chosen_stance = stances[random.randint(0, 2)]
 
+    monsters = [10, 6, 1, 3, 0]
+
+    for i in monsters:
+        if game.get_monster(i).dead == False:
+            paths = game.shortest_paths(me.location, i)
+            destination_node = paths[random.randint(0, len(paths)-1)][0]
+    
+
     # submit your decision for the turn (This function should be called exactly once per turn)
     game.submit_decision(destination_node, chosen_stance)
