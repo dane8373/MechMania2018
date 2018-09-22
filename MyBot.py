@@ -25,7 +25,10 @@ def get_winning_stance(stance):
         return "Rock"
 
 def check_monster(game, node):
-    return game.has_monster(node) and (game.get_monster(node).dead == False)
+    if (game.has_monster(node)):
+        if (game.get_monster(node).dead == False):
+            return True
+    return False
 
 def slay_monster(game, node):
     return get_winning_stance(game.get_monster(node).stance)
@@ -104,12 +107,12 @@ for line in fileinput.input():
             early_flag=False
             mid_flag=True
             mid_num=0
-            if (me.location==1):
+            if (me.location==1 or me.location==3):
                 mid_path = game.shortest_paths(me.location, 4)
             else:
                 mid_path = game.shortest_paths(me.location, 0)
 
-    elif mid_flag:
+    if mid_flag:
         if me.location == 0:
             mid_num=0
             if game.get_monster(0).dead and me.movement_counter - me.speed <= game.get_monster(0).respawn_counter and game.get_monster(0).respawn_counter < 7:
@@ -176,6 +179,7 @@ for line in fileinput.input():
                 #
                 #
         if me.location == 20:
+            mid_num=0
             if game.get_monster(21).dead == False and me.speed < 4: #go to 21
                 mid_path = game.shortest_paths(me.location, 21)
             else:
@@ -183,6 +187,8 @@ for line in fileinput.input():
             
         if me.location == 22:
             mid_num=0
+            if  me.rock>=4 and game.get_monster(21).dead == False and me.speed < 4: #go to 21
+                mid_path = game.shortest_paths(me.location, 21)
             if game.get_monster(16).dead == False: #go to 16
                 mid_path = game.shortest_paths(me.location, 16)
             elif game.get_monster(11).dead == False: #go to 11
