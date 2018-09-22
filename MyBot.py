@@ -181,7 +181,7 @@ for line in fileinput.input():
                 #
         if me.location == 20:
             mid_num=0
-            if game.get_monster(0).dead==false or game.get_monster(21).dead == False and me.speed < 4: #go to 21
+            if game.get_monster(0).dead==False or game.get_monster(21).dead == False and me.speed < 4: #go to 21
                 mid_path = game.shortest_paths(me.location, 21)
             else:
                 mid_path = game.shortest_paths(me.location, 13)
@@ -202,7 +202,7 @@ for line in fileinput.input():
                 #
         if me.location == 16:
             mid_num=0
-            if  game.get_monster(0).dead==false or game.get_monster(0).respawn_counter<15:
+            if  game.get_monster(0).dead==False or game.get_monster(0).respawn_counter<15:
                 mid_path = game.shortest_paths(me.location, 0)
             elif game.get_monster(15).dead == False: #go to 15
                 mid_path = game.shortest_paths(me.location, 15)
