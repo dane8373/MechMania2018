@@ -11,6 +11,7 @@ health_time=0
 early_flag=True
 mid_flag=False
 late_flag=False
+path_pointer=0
 # global variables or other functions can go here
 stances = ["Rock", "Paper", "Scissors"]
 
@@ -57,11 +58,10 @@ for line in fileinput.input():
         opp_path=game.shortest_paths(me.location, opp_loc)
         opp_stance=game.get_opponent().stance
         if (me.movement_counter - me.speed) == 1:
-            if (game.get_monster(me.destination).dead) == False:
+            if game.has_monster(me.destination) and (game.get_monster(me.destination).dead == False):
                 chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
             # if there's a monster at my location, choose the stance that damages that monster
-            chosen_stance = get_winning_stance(game.get_monster(me.destination).stance)
-        if (game.get_monster(me.location).dead) == False:
+        if game.has_monster(me.location) and (game.get_monster(me.location).dead == False):
             # if there's a monster at my location, choose the stance that damages that monster
             chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
         elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
@@ -80,7 +80,9 @@ for line in fileinput.input():
     if mid_flag:
         path = [0, 1, 3, 2, 4, 13,12,11,10,0]
         if me.location == me.destination: # check if we have moved this turn
-            destination_node=path.pop(0)
+            destination_node=path[path_pointer]
+            if path_pointer <len(path)-1:
+                path_pointer+=1
             # for i in monsters:
             #     if game.get_monster(i).dead == False:
             #         paths = game.shortest_paths(me.location, i)
@@ -100,11 +102,9 @@ for line in fileinput.input():
         opp_path=game.shortest_paths(me.location, opp_loc)
         opp_stance=game.get_opponent().stance
         if (me.movement_counter - me.speed) == 1:
-            if (game.get_monster(me.destination).dead) == False:
+            if game.has_monster(me.destination) and (game.get_monster(me.destination).dead == False):
                 chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
-            # if there's a monster at my location, choose the stance that damages that monster
-            chosen_stance = get_winning_stance(game.get_monster(me.destination).stance)
-        if (game.get_monster(me.location).dead) == False:
+        if game.has_monster(me.location) and (game.get_monster(me.location).dead == False):
             # if there's a monster at my location, choose the stance that damages that monster
             chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
         elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
