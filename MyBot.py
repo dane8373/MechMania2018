@@ -13,6 +13,9 @@ mid_flag=False
 late_flag=False
 mid_num=0
 mid_path=[[0]]
+opp_throw={"Rock": 0, "Paper": 0, "Scissors": 0} 
+opp_strat={"opp": 0, "opp opp": 0, "opp opp opp": 0} 
+fight_count = 0
 # global variables or other functions can go here
 stances = ["Rock", "Paper", "Scissors"]
 
@@ -23,6 +26,70 @@ def get_winning_stance(stance):
         return "Scissors"
     elif stance == "Scissors":
         return "Rock"
+
+def counter_strat(key, opp_stance):
+    if key == "opp":
+        return get_winning_stance(opp_stance)
+    elif key == "opp opp":
+        return get_winning_stance(get_winning_stance(opp_stance))
+    else:
+        return get_winning_stance(get_winning_stance(get_winning_stance(opp_stance)))
+
+def what_to_do(opp_stance):
+    # check for same throws or all equal meaning more random or cycle
+    if opp_throw["Scissors"] == 0 and opp_throw["Paper"] == 0:
+        return get_winning_stance("Rock")
+    if opp_throw["Scissors"] == 0 and opp_throw["Rock"] == 0:
+        return get_winning_stance("Paper")
+    if opp_throw["Rock"] == 0 and opp_throw["Paper"] == 0:
+        return get_winning_stance("Scissors")
+
+    key = ''
+    n = -999
+    for i in opp_throw.items():
+        if i[1] > n:
+            n = i[1]
+            key = i[0]
+    return counter_strat(key, opp_stance)
+
+def figure_out_strategy(stance, opp_stance):
+    if stance == "Rock":
+        if opp_stance == "Paper":
+            opp_throw["Paper"] =+ 1
+            opp_strat["opp"] =+ 1
+        elif opp_stance == "Scissor":
+            opp_throw["Scissor"] =+ 1
+            opp_strat["opp opp"] =+ 1
+        elif opp_stance == "Rock":
+            opp_throw["Rock"] =+ 1
+            opp_strat["opp opp opp"] =+ 1
+    if stance == "Scissor":
+        if opp_stance == "Rock":
+            opp_throw["Rock"] =+ 1
+            opp_strat["opp"] =+ 1
+        elif opp_stance == "Paper":
+            opp_throw["Paper"] =+ 1
+            opp_strat["opp opp"] =+ 1
+        elif opp_stance == "Scissor":
+            opp_throw["Scissor"] =+ 1
+            opp_strat["opp opp opp"] =+ 1
+    if stance == "Paper":
+        if opp_stance == "Scissor":
+            opp_throw["Scissor"] =+ 1
+            opp_strat["opp"] =+ 1
+        elif opp_stance == "Rock":
+            opp_throw["Rock"] =+ 1
+            opp_strat["opp opp"] =+ 1
+        elif opp_stance == "Paper":
+            opp_throw["Paper"] =+ 1
+            opp_strat["opp opp opp"] =+ 1
+
+def detect_cycle():
+    if fight_count % 3 == 0:
+        if opp_throw["Rock"] == opp_throw["Paper"] == opp_throw["Scissors"]:
+            return True 
+        else:
+            return False
 
 def check_monster(game, node):
     if (game.has_monster(node)):
@@ -58,6 +125,10 @@ for line in fileinput.input():
     # code in this block will be executed each turn of the game
     #health_spawns=[0,40,80,120,160,200,240,280];
     me = game.get_self()
+    if me.location == game.get_opponent().location and game.get_monster(me.location).dead:
+        figure_out_strategy(me.stance, game.get_opponent().stance)
+        fight_count =+ 1
+
     if (early_flag):
         monsters = [10, 6, 1, 0, 3]
         if me.location == me.destination: # check if we have moved this turn
@@ -116,7 +187,6 @@ for line in fileinput.input():
                 mid_path = game.shortest_paths(me.location, 0)
 
     if mid_flag:
-        game.log(str(me.location))
         if me.location == 0:
             mid_num=0
             if game.get_monster(0).dead and me.movement_counter - me.speed <= game.get_monster(0).respawn_counter and game.get_monster(0).respawn_counter < 7:
@@ -245,7 +315,6 @@ for line in fileinput.input():
                 mid_path = game.shortest_paths(me.location, 16)
         # set the destination
         if (me.destination==me.location or (mid_num==0 and me.destination!=mid_path[0][mid_num])):
-            game.log("path set " + str(mid_path))
             destination_node = mid_path[0][mid_num]
             mid_num+=1
         opp_loc=game.get_opponent().location
@@ -282,9 +351,17 @@ for line in fileinput.input():
             late_flag=True
     if late_flag:
         destination_node=0
-        chosen_stance="Paper"
+        opp_stance=game.get_opponent().stance
+        chosen_stance=get_winning_stance(opp_stance)
     #destination_node=0 #IMPORTANT DONT CHANGE
     # submit your decision for the turn (This function should be called exactly once per turn)
     if (game.get_turn_num()<7):
             destination_node=1
+    
+    if me.location == opp_loc and check_monster(game, me.location) == False:
+        chosen_stance = stances[random.randint(0,2)]
+
+    if (fight_count >= 3) and (me.location == game.get_opponent().location) and (game.get_monster(me.location).dead or game.has_monster(me.location) == False or me.location == 0):
+        chosen_stance = what_to_do(opp_loc)
+
     game.submit_decision(destination_node, chosen_stance)
