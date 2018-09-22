@@ -27,8 +27,8 @@ def get_winning_stance(stance):
 def check_monster(game, node):
     return game.has_monster(node) and (game.get_monster(node).dead == False)
 
-def slay_monster(game, me, chosen_stance):
-    chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
+def slay_monster(game, node, chosen_stance):
+    chosen_stance=get_winning_stance(game.get_monster(node).stance)
 
 # main player script logic
 # DO NOT CHANGE BELOW ----------------------------
@@ -66,11 +66,21 @@ for line in fileinput.input():
         opp_stance=game.get_opponent().stance
         if (me.movement_counter - me.speed) == 1:
             if check_monster(game, me.destination):
+                #
+                #
+                #slay_monster(game, me.destination, chosen_stance)
+                #
+                #
                 chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
             # if there's a monster at my location, choose the stance that damages that monster
         if check_monster(game, me.location):
             # if there's a monster at my location, choose the stance that damages that monster
             chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
+            #
+            #
+            #slay_monster(game, me.location, chosen_stance)
+            #
+            #
         elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
             chosen_stance=get_winning_stance(opp_stance)
         else:
@@ -231,9 +241,19 @@ for line in fileinput.input():
         opp_stance=game.get_opponent().stance
         if (me.movement_counter - me.speed) == 1:
             if check_monster(game, me.destination):
+                #
+                #
+                #slay_monster(game, me.destination, chosen_stance)
+                #
+                #
                 chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
         if check_monster(game, me.location):
             # if there's a monster at my location, choose the stance that damages that monster
+            #
+            #
+            #slay_monster(game, me.destination, chosen_stance)
+            #
+            #
             chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
         elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
             chosen_stance=get_winning_stance(opp_stance)
