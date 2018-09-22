@@ -101,8 +101,8 @@ for line in fileinput.input():
                 soonest=120
                 next_monster=0
                 for i in dead_monsters:
-                    if (game.get_moster(i).respawn_counter<soonest):
-                        soonest=game.get_moster(i).respawn_counter<soonest
+                    if (game.get_monster(i).respawn_counter<soonest):
+                        soonest=game.get_monster(i).respawn_counter<soonest
                         next_monster=i
                 mid_path = game.shortest_paths(me.location, next_monster)
 
