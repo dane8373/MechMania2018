@@ -24,8 +24,11 @@ def get_winning_stance(stance):
     elif stance == "Scissors":
         return "Rock"
 
-def check_monster(game, me):
-    return game.has_monster(me.destination) and (game.get_monster(me.destination).dead == False)
+def check_monster(game, node):
+    return game.has_monster(node) and (game.get_monster(node).dead == False)
+
+def slay_monster(game, me, chosen_stance):
+    chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
 
 # main player script logic
 # DO NOT CHANGE BELOW ----------------------------
@@ -62,10 +65,10 @@ for line in fileinput.input():
         opp_path=game.shortest_paths(me.location, opp_loc)
         opp_stance=game.get_opponent().stance
         if (me.movement_counter - me.speed) == 1:
-            if check_monster(game, me):
+            if check_monster(game, me.destination):
                 chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
             # if there's a monster at my location, choose the stance that damages that monster
-        if check_monster(game, me):
+        if check_monster(game, me.location):
             # if there's a monster at my location, choose the stance that damages that monster
             chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
         elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
@@ -227,9 +230,9 @@ for line in fileinput.input():
         opp_path=game.shortest_paths(me.location, opp_loc)
         opp_stance=game.get_opponent().stance
         if (me.movement_counter - me.speed) == 1:
-            if check_monster(game, me):
+            if check_monster(game, me.destination):
                 chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
-        if check_monster(game, me):
+        if check_monster(game, me.location):
             # if there's a monster at my location, choose the stance that damages that monster
             chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
         elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
