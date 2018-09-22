@@ -7,16 +7,20 @@ import json
 import random
 
 first_line = True # DO NOT REMOVE
+last_six=["Paper", "Paper", "Paper", "Paper", "Paper", "Paper", ]
+previous_stance=0
+speed_dude=0
 health_time=0
 early_flag=True
 mid_flag=False
 late_flag=False
 mid_num=0
 mid_path=[[0]]
+fight_count=0
 opp_throw={"Rock": 0, "Paper": 0, "Scissors": 0} 
 opp_strat={"opp": 0, "opp opp": 0, "opp opp opp": 0} 
-fight_count = 0
 # global variables or other functions can go here
+early_num=0
 stances = ["Rock", "Paper", "Scissors"]
 
 def get_winning_stance(stance):
@@ -27,13 +31,13 @@ def get_winning_stance(stance):
     elif stance == "Scissors":
         return "Rock"
 
-def counter_strat(key, opp_stance):
-    if key == "opp":
-        return get_winning_stance(opp_stance)
-    elif key == "opp opp":
-        return get_winning_stance(get_winning_stance(opp_stance))
+def counter_strat(key, me_stance):
+    if key == "opp opp":
+        return get_winning_stance(me_stance)
+    elif key == "opp":
+        return get_winning_stance(get_winning_stance(me_stance))
     else:
-        return get_winning_stance(get_winning_stance(get_winning_stance(opp_stance)))
+        return get_winning_stance(me_stance)
 
 def what_to_do(opp_stance):
     # check for same throws or all equal meaning more random or cycle
@@ -46,7 +50,7 @@ def what_to_do(opp_stance):
 
     key = ''
     n = -999
-    for i in opp_throw.items():
+    for i in opp_strat.items():
         if i[1] > n:
             n = i[1]
             key = i[0]
@@ -55,41 +59,34 @@ def what_to_do(opp_stance):
 def figure_out_strategy(stance, opp_stance):
     if stance == "Rock":
         if opp_stance == "Paper":
-            opp_throw["Paper"] =+ 1
-            opp_strat["opp"] =+ 1
-        elif opp_stance == "Scissor":
-            opp_throw["Scissor"] =+ 1
-            opp_strat["opp opp"] =+ 1
+            opp_throw["Paper"] += 1
+            opp_strat["opp"] += 1
+        elif opp_stance == "Scissors":
+            opp_throw["Scissors"] += 1
+            opp_strat["opp opp"] += 1
         elif opp_stance == "Rock":
-            opp_throw["Rock"] =+ 1
-            opp_strat["opp opp opp"] =+ 1
-    if stance == "Scissor":
+            opp_throw["Rock"] += 1
+            opp_strat["opp opp opp"] += 1
+    if stance == "Scissors":
         if opp_stance == "Rock":
-            opp_throw["Rock"] =+ 1
-            opp_strat["opp"] =+ 1
+            opp_throw["Rock"] += 1
+            opp_strat["opp"] += 1
         elif opp_stance == "Paper":
-            opp_throw["Paper"] =+ 1
-            opp_strat["opp opp"] =+ 1
-        elif opp_stance == "Scissor":
-            opp_throw["Scissor"] =+ 1
-            opp_strat["opp opp opp"] =+ 1
+            opp_throw["Paper"] += 1
+            opp_strat["opp opp"] += 1
+        elif opp_stance == "Scissors":
+            opp_throw["Scissors"] += 1
+            opp_strat["opp opp opp"] += 1
     if stance == "Paper":
-        if opp_stance == "Scissor":
-            opp_throw["Scissor"] =+ 1
-            opp_strat["opp"] =+ 1
+        if opp_stance == "Scissors":
+            opp_throw["Scissors"] += 1
+            opp_strat["opp"] += 1
         elif opp_stance == "Rock":
-            opp_throw["Rock"] =+ 1
-            opp_strat["opp opp"] =+ 1
+            opp_throw["Rock"] += 1
+            opp_strat["opp opp"] += 1
         elif opp_stance == "Paper":
-            opp_throw["Paper"] =+ 1
-            opp_strat["opp opp opp"] =+ 1
-
-def detect_cycle():
-    if fight_count % 3 == 0:
-        if opp_throw["Rock"] == opp_throw["Paper"] == opp_throw["Scissors"]:
-            return True 
-        else:
-            return False
+            opp_throw["Paper"] += 1
+            opp_strat["opp opp opp"] += 1
 
 def check_monster(game, node):
     if (game.has_monster(node)):
@@ -132,17 +129,21 @@ for line in fileinput.input():
     # code in this block will be executed each turn of the game
     #health_spawns=[0,40,80,120,160,200,240,280];
     me = game.get_self()
-    if me.location == game.get_opponent().location and game.get_monster(me.location).dead:
-        figure_out_strategy(me.stance, game.get_opponent().stance)
-        fight_count =+ 1
+    if me.location == game.get_opponent().location and (check_monster(game, me.location)==False or game.get_turn_num()>=300):
+        figure_out_strategy(previous_stance, game.get_opponent().stance)
+        game.log("will use " + what_to_do(me.stance) + " because i used " +  me.stance + " last")
 
+    game.log("opp throws " +str(opp_throw)) 
+    game.log("opp strat " +str(opp_strat))
+    previous_stance = me.stance
     if (early_flag):
         monsters = [10, 6, 1, 0, 3]
-        if me.location == me.destination or (check_monster(game,me.location) and game.get_monster(me.location).health > (me.movement_counter-me.speed)*count_skill_level(me,game.get_monster(me.location).stance)): # check if we have moved this turn
+        if me.location == me.destination or (check_monster(game,me.location)==False and game.get_monster(me.location).health > (me.movement_counter-me.speed)*count_skill_level(me,game.get_monster(me.location).stance)): # check if we have moved this turn
             for i in monsters:
                 if game.get_monster(i).dead == False or game.get_monster(i).respawn_counter <= 3:
                     paths = game.shortest_paths(me.location, i)
-                    destination_node = paths[random.randint(0, len(paths)-1)][0]
+                    if (i!=me.location):
+                        destination_node = paths[random.randint(0, len(paths)-1)][0]
             # get all living monsters closest to me
             #monsters = game.nearest_monsters(me.location, 1)
 
@@ -184,6 +185,9 @@ for line in fileinput.input():
             #health_time=40+game.get_turn_num()
         if  me.location==0 and game.get_monster(0).dead and me.movement_counter - me.speed <= game.get_monster(0).respawn_counter and game.get_monster(0).respawn_counter < 7:
             destination_node=0
+        if (me.location==3 and speed_dude==0 and opp_loc!=3):
+            speed_dude=1
+            destination_node=3
         if me.paper >=4:
             early_flag=False
             mid_flag=True
@@ -342,6 +346,7 @@ for line in fileinput.input():
         opp_loc=game.get_opponent().location
         opp_path=game.shortest_paths(me.location, opp_loc)
         opp_stance=game.get_opponent().stance
+
         if (me.movement_counter - me.speed) == 1:
             if check_monster(game, me.destination):
                 #
@@ -384,7 +389,10 @@ for line in fileinput.input():
     if me.location == opp_loc and check_monster(game, me.location) == False:
         chosen_stance = stances[random.randint(0,2)]
 
-    if (fight_count >= 3) and (me.location == game.get_opponent().location) and (game.get_monster(me.location).dead or game.has_monster(me.location) == False or me.location == 0):
-        chosen_stance = what_to_do(opp_loc)
-
+    if (me.location == game.get_opponent().location) and (check_monster(game, me.location) == False or me.location == 0):
+        fight_count+=1
+        if (fight_count>6):
+            chosen_stance = what_to_do(me.stance)
+        else:
+            chosen_stance = stances[random.randint(0, 2)]
     game.submit_decision(destination_node, chosen_stance)
