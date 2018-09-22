@@ -27,8 +27,17 @@ def get_winning_stance(stance):
 def check_monster(game, node):
     return game.has_monster(node) and (game.get_monster(node).dead == False)
 
-def slay_monster(game, node, chosen_stance):
-    chosen_stance=get_winning_stance(game.get_monster(node).stance)
+def slay_monster(game, node):
+    return get_winning_stance(game.get_monster(node).stance)
+    
+def next_to_spawn(dead_monsters, game, me):
+            soonest=120
+            next_monster=0
+            for i in dead_monsters:
+                if (game.get_monster(i).respawn_counter < soonest):
+                    soonest = game.get_monster(i).respawn_counter < soonest
+                    next_monster = i
+            return game.shortest_paths(me.location, next_monster)
 
 # main player script logic
 # DO NOT CHANGE BELOW ----------------------------
@@ -68,7 +77,7 @@ for line in fileinput.input():
             if check_monster(game, me.destination):
                 #
                 #
-                #slay_monster(game, me.destination, chosen_stance)
+                #chosen_stance = slay_monster(game, me.destination)
                 #
                 #
                 chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
@@ -78,7 +87,7 @@ for line in fileinput.input():
             chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
             #
             #
-            #slay_monster(game, me.location, chosen_stance)
+            #chosen_stance = slay_monster(game, me.location, chosen_stance)
             #
             #
         elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
@@ -118,6 +127,11 @@ for line in fileinput.input():
                         soonest=game.get_monster(i).respawn_counter<soonest
                         next_monster=i
                 mid_path = game.shortest_paths(me.location, next_monster)
+                #
+                #
+                #mid_path = next_to_spawn([11,16, 4], game, me)
+                #
+                #
 
         if me.location == 3:
             mid_num=0
@@ -154,6 +168,11 @@ for line in fileinput.input():
                         soonest=game.get_monster(i).respawn_counter<soonest
                         next_monster=i
                 mid_path = game.shortest_paths(me.location, next_monster)
+                #
+                #
+                #mid_path = next_to_spawn([13,22], game, me)
+                #
+                #
 
         if me.location == 13:
             mid_num=0
@@ -174,6 +193,11 @@ for line in fileinput.input():
                         soonest=game.get_monster(i).respawn_counter<soonest
                         next_monster=i
                 mid_path = game.shortest_paths(me.location, next_monster)
+                #
+                #
+                #mid_path = next_to_spawn([11,16, 4], game, me)
+                #
+                #
 
         if me.location == 22:
             mid_num=0
@@ -190,6 +214,14 @@ for line in fileinput.input():
                         soonest=game.get_monster(i).respawn_counter<soonest
                         next_monster=i
                 mid_path = game.shortest_paths(me.location, next_monster)
+
+                #
+                #
+                #mid_path = next_to_spawn([11,16], game, me)
+                #
+                #
+
+        
                 
 
         if me.location == 16:
@@ -243,7 +275,7 @@ for line in fileinput.input():
             if check_monster(game, me.destination):
                 #
                 #
-                #slay_monster(game, me.destination, chosen_stance)
+                #chosen_stance = slay_monster(game, me.destination)
                 #
                 #
                 chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
@@ -251,7 +283,7 @@ for line in fileinput.input():
             # if there's a monster at my location, choose the stance that damages that monster
             #
             #
-            #slay_monster(game, me.destination, chosen_stance)
+            #chosen_stance = slay_monster(game, me.destination)
             #
             #
             chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
