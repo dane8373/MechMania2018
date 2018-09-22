@@ -12,7 +12,7 @@ early_flag=True
 mid_flag=False
 late_flag=False
 mid_num=0
-mid_path=[0]
+mid_path=[[0]]
 # global variables or other functions can go here
 stances = ["Rock", "Paper", "Scissors"]
 
@@ -246,7 +246,7 @@ for line in fileinput.input():
             mid_flag=False
             late_flag=True
     if late_flag:
-        destination_node=0;
+        destination_node=0
         chosen_stance="Paper"
     #destination_node=0 #IMPORTANT DONT CHANGE
     # submit your decision for the turn (This function should be called exactly once per turn)
