@@ -37,10 +37,10 @@ for line in fileinput.input():
     #health_spawns=[0,40,80,120,160,200,240,280];
     me = game.get_self()
     if (early_flag):
-        monsters = [10, 6, 1, 3, 0]
+        monsters = [10, 6, 1, 0, 3]
         if me.location == me.destination: # check if we have moved this turn
             for i in monsters:
-                if game.get_monster(i).dead == False:
+                if game.get_monster(i).dead == False or game.get_monster(i).respawn_counter <= 3:
                     paths = game.shortest_paths(me.location, i)
                     destination_node = paths[random.randint(0, len(paths)-1)][0]
             # get all living monsters closest to me
@@ -72,7 +72,7 @@ for line in fileinput.input():
                 chosen_stance = stances[random.randint(0, 2)]
         #if game.get_monster(0).dead == False:
             #health_time=40+game.get_turn_num()
-        if game.get_monster(0).dead and 5 == game.get_monster(0).respawn_counter:
+        if  me.location==0 and game.get_monster(0).dead and me.movement_counter - me.speed <= game.get_monster(0).respawn_counter and game.get_monster(0).respawn_counter < 7:
             destination_node=0
         if game.get_turn_num()>160:
             early_flag=False
@@ -83,6 +83,8 @@ for line in fileinput.input():
             destination_node=path[path_pointer]
             if path_pointer <len(path)-1:
                 path_pointer+=1
+            else:
+                path_pointer=0
             # for i in monsters:
             #     if game.get_monster(i).dead == False:
             #         paths = game.shortest_paths(me.location, i)
@@ -125,4 +127,6 @@ for line in fileinput.input():
         chosen_stance="Paper"
     #destination_node=0 #IMPORTANT DONT CHANGE
     # submit your decision for the turn (This function should be called exactly once per turn)
+    if (game.get_turn_num()<7):
+            destination_node=1
     game.submit_decision(destination_node, chosen_stance)
