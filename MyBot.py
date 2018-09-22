@@ -7,7 +7,10 @@ import json
 import random
 
 first_line = True # DO NOT REMOVE
-
+health_time=0
+early_flag=True
+mid_flag=False
+late_flag=False
 # global variables or other functions can go here
 stances = ["Rock", "Paper", "Scissors"]
 
@@ -30,36 +33,96 @@ for line in fileinput.input():
 # DO NOT CHANGE ABOVE ---------------------------
 
     # code in this block will be executed each turn of the game
-
+    #health_spawns=[0,40,80,120,160,200,240,280];
     me = game.get_self()
+    if (early_flag):
+        monsters = [10, 6, 1, 3, 0]
+        if me.location == me.destination: # check if we have moved this turn
+            for i in monsters:
+                if game.get_monster(i).dead == False:
+                    paths = game.shortest_paths(me.location, i)
+                    destination_node = paths[random.randint(0, len(paths)-1)][0]
+            # get all living monsters closest to me
+            #monsters = game.nearest_monsters(me.location, 1)
 
-    if me.location == me.destination: # check if we have moved this turn
-        # get all living monsters closest to me
-        monsters = game.nearest_monsters(me.location, 1)
+            # choose a monster to move to at random
+            #monster_to_move_to = monsters[random.randint(0, len(monsters)-1)]
 
-        # choose a monster to move to at random
-        monster_to_move_to = monsters[random.randint(0, len(monsters)-1)]
+            # get the set of shortest paths to that monster
+            #paths = game.shortest_paths(me.location, monster_to_move_to.location)
+            #destination_node = paths[random.randint(0, len(paths)-1)][0]
+        else:
+            destination_node = me.destination
+        opp_loc=game.get_opponent().location
+        opp_path=game.shortest_paths(me.location, opp_loc)
+        opp_stance=game.get_opponent().stance
+        if (me.movement_counter - me.speed) == 1:
+            if (game.get_monster(me.destination).dead) == False:
+                chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
+            # if there's a monster at my location, choose the stance that damages that monster
+            chosen_stance = get_winning_stance(game.get_monster(me.destination).stance)
+        if (game.get_monster(me.location).dead) == False:
+            # if there's a monster at my location, choose the stance that damages that monster
+            chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
+        elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
+            chosen_stance=get_winning_stance(opp_stance)
+        else:
+            # otherwise, pick a random stance
+            if (me.movement_counter - me.speed) > 1:
+                chosen_stance = stances[random.randint(0, 2)]
+        #if game.get_monster(0).dead == False:
+            #health_time=40+game.get_turn_num()
+        if game.get_monster(0).dead and 5 == game.get_monster(0).respawn_counter:
+            destination_node=0
+        if game.get_turn_num()>160:
+            early_flag=False
+            mid_flag=True
+    if mid_flag:
+        path = [0, 1, 3, 2, 4, 13,12,11,10,0]
+        if me.location == me.destination: # check if we have moved this turn
+            destination_node=path.pop(0)
+            # for i in monsters:
+            #     if game.get_monster(i).dead == False:
+            #         paths = game.shortest_paths(me.location, i)
+            #         destination_node = paths[random.randint(0, len(paths)-1)][0]
+            # get all living monsters closest to me
+            #monsters = game.nearest_monsters(me.location, 1)
 
-        # get the set of shortest paths to that monster
-        paths = game.shortest_paths(me.location, monster_to_move_to.location)
-        destination_node = paths[random.randint(0, len(paths)-1)][0]
-    else:
-        destination_node = me.destination
+            # choose a monster to move to at random
+            #monster_to_move_to = monsters[random.randint(0, len(monsters)-1)]
 
-    if game.has_monster(me.location):
-        # if there's a monster at my location, choose the stance that damages that monster
-        chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
-    else:
-        # otherwise, pick a random stance
-        chosen_stance = stances[random.randint(0, 2)]
-
-    monsters = [10, 6, 1, 3, 0]
-
-    for i in monsters:
-        if game.get_monster(i).dead == False:
-            paths = game.shortest_paths(me.location, i)
-            destination_node = paths[random.randint(0, len(paths)-1)][0]
-    
-
+            # get the set of shortest paths to that monster
+            #paths = game.shortest_paths(me.location, monster_to_move_to.location)
+            #destination_node = paths[random.randint(0, len(paths)-1)][0]
+        else:
+            destination_node = me.destination
+        opp_loc=game.get_opponent().location
+        opp_path=game.shortest_paths(me.location, opp_loc)
+        opp_stance=game.get_opponent().stance
+        if (me.movement_counter - me.speed) == 1:
+            if (game.get_monster(me.destination).dead) == False:
+                chosen_stance=get_winning_stance(game.get_monster(me.destination).stance)
+            # if there's a monster at my location, choose the stance that damages that monster
+            chosen_stance = get_winning_stance(game.get_monster(me.destination).stance)
+        if (game.get_monster(me.location).dead) == False:
+            # if there's a monster at my location, choose the stance that damages that monster
+            chosen_stance = get_winning_stance(game.get_monster(me.location).stance)
+        elif len(opp_path[0])<=1 and opp_stance!="Invalid Stance" and (me.movement_counter - me.speed) > 1:
+            chosen_stance=get_winning_stance(opp_stance)
+        else:
+            # otherwise, pick a random stance
+            if (me.movement_counter - me.speed) > 1:
+                chosen_stance = stances[random.randint(0, 2)]
+        #if game.get_monster(0).dead == False:
+            #health_time=40+game.get_turn_num()
+        #if game.get_monster(0).dead and 5 == game.get_monster(0).respawn_counter:
+            #destination_node=0
+        if game.get_turn_num()>300:
+            mid_flag=False
+            late_flag=True
+    if late_flag:
+        destination_node=0;
+        chosen_stance="Paper"
+    #destination_node=0 #IMPORTANT DONT CHANGE
     # submit your decision for the turn (This function should be called exactly once per turn)
     game.submit_decision(destination_node, chosen_stance)
