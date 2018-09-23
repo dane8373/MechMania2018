@@ -338,7 +338,7 @@ for line in fileinput.input():
         if (mid_path[0][len(mid_path[0])-1]!=21 and game.get_monster(0).dead==False) or (mid_path[0][len(mid_path[0])-1]!=21 and (time_to_node(game, me, 0) + (7-me.speed+1) > game.get_monster(0).respawn_counter)):
             #game.log(str(len(mid_path[0])-1) +" spawns in " + str(game.get_monster(0).respawn_counter) + " distacne " +str(time_to_node(game, me, 0)) )
             mid_path = game.shortest_paths(me.location, 0)
-            if (me.location==4):
+            if (len(mid_path)>2 and (me.location==4 or me.location==11 or me.location==12)):
                 mid_path[0][0]=mid_path[1][0]
             destination_node=mid_path[0][0]
             midnum=0
