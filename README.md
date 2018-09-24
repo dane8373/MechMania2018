@@ -5,6 +5,8 @@ The challaenge was an RPG style rock paper scissors game, where players
 can move around a map, slay monsters and gain stats in preparation for
 the final duel at the end. 
 
+Code in this repository consists of provided game code and our written bot code. The MyBot.py code was written by us, the rest was given by the competition
+
 The code in this repository created a bot that used a decision tree 
 that took in information of the current board state and decided where to move
 the dueling algorithm attempted to determine what strategy the opponent was
