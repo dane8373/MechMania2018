@@ -14,6 +14,8 @@ using and counter it.
 
 This team placed 8/41 at the competition.
 
+The code was created over a span of 24 hours, and is left in its original state to reflect the program at the conclusion of the competition
+
 # Mechmania Python Starter Pack
 
 Here's all the code you need to get started with making a bot for Mechmania in Python. Just do these steps:
