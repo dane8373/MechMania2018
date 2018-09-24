@@ -1,3 +1,17 @@
+# MECHMANIA PROJECT
+# By Dane Zieman, Mark Dabler, Karol Stolarski
+This repository contains the code for the MechMania 2018 named "Luke".
+The challaenge was an RPG style rock paper scissors game, where players
+can move around a map, slay monsters and gain stats in preparation for
+the final duel at the end. 
+
+The code in this repository created a bot that used a decision tree 
+that took in information of the current board state and decided where to move
+the dueling algorithm attempted to determine what strategy the opponent was
+using and counter it.
+
+This team placed 8/41 at the competition.
+
 # Mechmania Python Starter Pack
 
 Here's all the code you need to get started with making a bot for Mechmania in Python. Just do these steps:
